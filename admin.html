@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <link rel="icon" href="imagenes/logo-kingbrasa.png">
+  <meta charset="UTF-8">
+  <title>King Brasa Delivery</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script defer src="script.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+</head>
+<body onload="adminInit()">
+  <header>
+  <h2>King Brasa</h2>
+  <button class="hamburger" id="hamburgerBtn" aria-label="Menú">
+    <i class="fas fa-bars"></i>
+  </button>
+  <nav class="nav-buttons" id="navMenu">
+    <a href="menu principal.html"><i class="fas fa-home"></i> Inicio</a>
+    <a href="Cmenu.html"><i class="fas fa-utensils"></i> Carta</a>
+  
+    <a href="nosotros.html"><i class="fas fa-users"></i> Nosotros</a>
+    
+    <!-- Este espacio se usará para insertar el botón de Admin si corresponde -->
+    <span id="adminBtnContainer"></span>
+
+    <!-- Este espacio se usará para insertar el botón de login o logout -->
+    <span id="userBtns"></span>
+  </nav>
+</header>
+
+  <section class="fade-in">
+    <h2>Editar Menú</h2>
+    <form id="formAdd" onsubmit="event.preventDefault(); addItem()"
+          style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem;">
+      <input name="nombre" required placeholder="Nombre">
+      <input name="precio" required type="number" placeholder="Precio">
+      <select name="cat" required>
+        
+        <option value="Entradas">Entradas</option>
+        <option value="Platos Principales">Platos Principales</option>
+        <option value="Postres">Postres</option>
+        <option value="Bebidas">Bebidas</option>
+      </select>
+      <input id="newCatInput" placeholder="Nueva categoría">
+      <button type="button" onclick="addCategoria()">➕ Añadir categoría</button> 
+      <input name="img" placeholder="URL imagen (opcional)">
+      <textarea name="descripcion" placeholder="Descripción del plato (opcional)" rows="2"></textarea>
+      <button class="btn">Añadir</button>
+    </form>
+
+    <table>
+      <thead><tr><th></th><th>Nombre</th><th>Precio</th><th>Categoría</th><th>Descripción</th><th></th></tr></thead>
+      <tbody id="tbodyMenu"></tbody>
+    </table>
+  </section>
+
+  <section class="fade-in">
+    <h2>pedidos recibidas</h2>
+    <table>
+      <thead><tr><th>Nombre</th><th>Email</th><th>Fecha</th><th>Hora</th><th>Pers.</th></tr></thead>
+      <tbody id="tbodyRes"></tbody>
+    </table>
+  </section>
+  
+  <section class="fade-in">
+  <h2>Pedidos recibidos</h2>
+  <table>
+    <thead><tr><th>Nombre</th><th>Teléfono</th><th>Dirección</th><th>Método</th><th>Fecha</th><th>Platos</th></tr></thead>
+    <tbody id="tbodyPedidos"></tbody>
+  </table>
+</section>
+<section class="fade-in" id="graficoPedidosSection" style="display:none;">
+  <h2>Pedidos por Categoría</h2>
+  <canvas id="graficoPedidos" width="50" height="50"></canvas>
+</section>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const user = JSON.parse(localStorage.getItem('cepasSession') || 'null');
+
+    const adminContainer = document.getElementById('adminBtnContainer');
+    const userBtnsContainer = document.getElementById('userBtns');
+
+    // Si el usuario es admin, muestra el botón Admin
+    if (user?.admin && adminContainer) {
+      const adminBtn = document.createElement('a');
+      adminBtn.href = 'admin.html';
+      adminBtn.innerHTML = `<i class="fas fa-user-shield"></i> Admin`;
+      adminContainer.appendChild(adminBtn);
+    }
+
+    // Si el usuario ha iniciado sesión, muestra "Cerrar sesión"
+    if (user && userBtnsContainer) {
+      const logoutBtn = document.createElement('button');
+      logoutBtn.className = 'btn outline';
+      logoutBtn.innerHTML = `<i class="fas fa-sign-out-alt"></i> Cerrar sesión`;
+      logoutBtn.onclick = logout;
+      userBtnsContainer.appendChild(logoutBtn);
+    }
+
+    // Si el usuario NO ha iniciado sesión, muestra "Ingresar / Registrarse"
+    if (!user && userBtnsContainer) {
+      const loginBtn = document.createElement('button');
+      loginBtn.className = 'btn outline';
+      loginBtn.innerHTML = `<i class="fas fa-user"></i> Ingresar / Registrarse`;
+      loginBtn.onclick = () => {
+        document.getElementById('modalLogin')?.classList.add('open');
+      };
+      userBtnsContainer.appendChild(loginBtn);
+    }
+  });
+
+  function logout() {
+    localStorage.removeItem('cepasSession');
+    location.reload();
+  }
+</script>
+
+
+    <section style="padding:1rem;">
+      <h2>Pedidos recibidos (simulado local)</h2>
+      <table border="1" style="width:100%;border-collapse:collapse">
+        <thead><tr><th>ID</th><th>Cliente</th><th>Dirección</th><th>Total</th><th>Estado</th><th>Acción</th></tr></thead>
+        <tbody id="orders-table"><tr><td colspan="6">Cargando...</td></tr></tbody>
+      </table>
+      <p>Nota: Los pedidos se almacenan en localStorage del navegador (clave <code>kingbrasa_orders</code>).</p>
+    </section>
+    </body>
+</html>
